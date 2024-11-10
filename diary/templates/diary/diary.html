@@ -1,0 +1,30 @@
+{% extends "diary/base.html" %}
+
+{% block title %}Личный дневник{% endblock %}
+
+{% block content %}
+    <h1>Мои записи</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Добавить запись</button>
+    </form>
+    <ul>
+        {% for entry in entries %}
+            <li>
+                <div class="entry-content">
+                    {{ entry.content }}
+                    <span class="date">{{ entry.date_created|date:"d.m.Y H:i" }}</span>
+                </div>
+                <div class="entry-actions">
+                    <a href="{% url 'edit_entry' entry.id %}">✏️ Редактировать</a>
+                    <a href="{% url 'delete_entry' entry.id %}" onclick="return confirm('Вы уверены, что хотите удалить эту запись?')">🗑️ Удалить</a>
+                </div>
+            </li>
+        {% empty %}
+            <li style="text-align: center; color: #666;">
+                Записей пока нет. Создайте свою первую запись!
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
