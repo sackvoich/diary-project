@@ -2,12 +2,17 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Entry(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='entries')
+    is_public = models.BooleanField(default=False)  # Добавляем это поле
 
     class Meta:
         ordering = ['-date_created']
+        verbose_name_plural = 'entries'
+
+    def __str__(self):
+        return f'{self.date_created.strftime("%Y-%m-%d %H:%M")} - {self.content[:50]}...'
 
 class LoginLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

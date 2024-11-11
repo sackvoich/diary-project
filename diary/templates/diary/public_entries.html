@@ -1,0 +1,24 @@
+{% extends "diary/base.html" %}
+
+{% block title %}Публичные записи{% endblock %}
+
+{% block content %}
+    <h1>Публичные записи</h1>
+    <ul class="entries-list">
+        {% for entry in entries %}
+            <li class="entry-item">
+                <div class="entry-content">
+                    {{ entry.content }}
+                    <div class="entry-meta">
+                        <span class="author">Автор: {{ entry.user.username }}</span>
+                        <span class="date">{{ entry.date_created|date:"d.m.Y H:i" }}</span>
+                    </div>
+                </div>
+            </li>
+        {% empty %}
+            <li class="no-entries">
+                Пока нет публичных записей.
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

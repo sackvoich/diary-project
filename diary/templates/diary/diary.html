@@ -4,17 +4,33 @@
 
 {% block content %}
     <h1>Мои записи</h1>
-    <form method="POST">
+    <form method="POST" class="entry-form">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="form-group">
+            {{ form.content.label_tag }}
+            {{ form.content }}
+        </div>
+        <div class="form-group privacy-setting">
+            {{ form.is_public }}
+            {{ form.is_public.label_tag }}
+        </div>
         <button type="submit">Добавить запись</button>
     </form>
-    <ul>
+    <ul class="entries-list">
         {% for entry in entries %}
-            <li>
+            <li class="entry-item {% if entry.is_public %}public{% endif %}">
                 <div class="entry-content">
                     {{ entry.content }}
-                    <span class="date">{{ entry.date_created|date:"d.m.Y H:i" }}</span>
+                    <div class="entry-meta">
+                        <span class="date">{{ entry.date_created|date:"d.m.Y H:i" }}</span>
+                        <span class="privacy-status">
+                            {% if entry.is_public %}
+                                🌍 Публичная
+                            {% else %}
+                                🔒 Приватная
+                            {% endif %}
+                        </span>
+                    </div>
                 </div>
                 <div class="entry-actions">
                     <a href="{% url 'edit_entry' entry.id %}">✏️ Редактировать</a>
@@ -22,7 +38,7 @@
                 </div>
             </li>
         {% empty %}
-            <li style="text-align: center; color: #666;">
+            <li class="no-entries">
                 Записей пока нет. Создайте свою первую запись!
             </li>
         {% endfor %}

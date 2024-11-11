@@ -6,6 +6,7 @@ from .forms import RegistrationForm, EntryForm
 from .models import Entry, LoginLog
 from django.contrib.auth.views import LoginView
 
+
 def index(request):
     return redirect('login')
 
@@ -44,19 +45,23 @@ def diary(request):
     if request.method == 'POST':
         form = EntryForm(request.POST)
         if form.is_valid():
-            Entry.objects.create(
-                content=form.cleaned_data['content'],
-                user=request.user
-            )
+            entry = form.save(commit=False)
+            entry.user = request.user
+            entry.save()
+            messages.success(request, 'Запись добавлена!')
             return redirect('diary')
     else:
         form = EntryForm()
     
     entries = Entry.objects.filter(user=request.user)
-    return render(request, 'diary/diary.html', {
-        'form': form,
+    return render(request, 'diary/diary.html', {'form': form, 'entries': entries})
+
+def public_entries(request):
+    entries = Entry.objects.filter(is_public=True).order_by('-date_created')
+    return render(request, 'diary/public_entries.html', {
         'entries': entries
     })
+
 
 @login_required
 def edit_entry(request, entry_id):
