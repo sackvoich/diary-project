@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    {% load static %}
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'diary/styles.css' %}">
 </head>
@@ -40,4 +41,5 @@
         <p>&copy; 2024 Дневник. Все права защищены.</p>
     </footer>
 </body>
+{% block extra_js %}{% endblock %}
 </html>

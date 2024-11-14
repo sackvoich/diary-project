@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login
 from django.contrib import messages
 from .forms import RegistrationForm, EntryForm
 from .models import Entry, LoginLog
-from django.contrib.auth.views import LoginView
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+import json
 
 
 def index(request):
@@ -62,27 +63,24 @@ def public_entries(request):
         'entries': entries
     })
 
-
 @login_required
+@require_POST
 def edit_entry(request, entry_id):
-    entry = get_object_or_404(Entry, id=entry_id, user=request.user)
-    
-    if request.method == 'POST':
-        form = EntryForm(request.POST)
-        if form.is_valid():
-            entry.content = form.cleaned_data['content']
-            entry.save()
-            return redirect('diary')
-    else:
-        form = EntryForm(initial={'content': entry.content})
-    
-    return render(request, 'diary/edit_entry.html', {
-        'form': form,
-        'entry': entry
-    })
+    try:
+        entry = Entry.objects.get(id=entry_id, user=request.user)
+        data = json.loads(request.body)
+        entry.content = data['content']
+        entry.save()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 @login_required
+@require_POST
 def delete_entry(request, entry_id):
-    entry = get_object_or_404(Entry, id=entry_id, user=request.user)
-    entry.delete()
-    return redirect('diary')
+    try:
+        entry = Entry.objects.get(id=entry_id, user=request.user)
+        entry.delete()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

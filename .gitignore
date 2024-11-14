@@ -42,3 +42,6 @@ ENV/
 .env
 *.pem
 *.key
+
+# Static Files
+staticfiles

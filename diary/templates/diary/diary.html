@@ -1,46 +1,63 @@
 {% extends "diary/base.html" %}
+{% load static %}  <!--- Добавлен load static -->
 
 {% block title %}Личный дневник{% endblock %}
 
 {% block content %}
-    <h1>Мои записи</h1>
-    <form method="POST" class="entry-form">
-        {% csrf_token %}
-        <div class="form-group">
-            {{ form.content.label_tag }}
-            {{ form.content }}
-        </div>
-        <div class="form-group privacy-setting">
-            {{ form.is_public }}
-            {{ form.is_public.label_tag }}
-        </div>
-        <button type="submit">Добавить запись</button>
-    </form>
-    <ul class="entries-list">
-        {% for entry in entries %}
-            <li class="entry-item {% if entry.is_public %}public{% endif %}">
-                <div class="entry-content">
-                    {{ entry.content }}
+    <div class="diary-container">
+        <h1>Мои записи</h1>
+        <form method="POST" class="entry-form">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.content.label_tag }}
+                {{ form.content }}
+            </div>
+            <div class="form-group privacy-setting">
+                {{ form.is_public }}
+                {{ form.is_public.label_tag }}
+            </div>
+            <button type="submit">Добавить запись</button>
+        </form>
+
+        <ul class="entries-list">
+            {% for entry in entries %}
+                <li class="entry-item {% if entry.is_public %}public{% endif %}" data-entry-id="{{ entry.id }}">
+                    <span class="edit-url" style="display:none;" data-url="{% url 'edit_entry' entry_id=entry.id %}"></span> <!--- Добавлено -->
+                    <div class="entry-content">
+                        <p class="content-text" style="display: block;">{{ entry.content }}</p>
+                        <textarea class="edit-textarea" style="display: none;">{{ entry.content }}</textarea>
+                    </div>
                     <div class="entry-meta">
                         <span class="date">{{ entry.date_created|date:"d.m.Y H:i" }}</span>
-                        <span class="privacy-status">
-                            {% if entry.is_public %}
-                                🌍 Публичная
-                            {% else %}
-                                🔒 Приватная
-                            {% endif %}
-                        </span>
+                        <div class="entry-status">
+                            <span class="privacy-status">
+                                {% if entry.is_public %}
+                                    🌍 Публичная
+                                {% else %}
+                                    🔒 Приватная
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
-                </div>
-                <div class="entry-actions">
-                    <a href="{% url 'edit_entry' entry.id %}">✏️ Редактировать</a>
-                    <a href="{% url 'delete_entry' entry.id %}" onclick="return confirm('Вы уверены, что хотите удалить эту запись?')">🗑️ Удалить</a>
-                </div>
-            </li>
-        {% empty %}
-            <li class="no-entries">
-                Записей пока нет. Создайте свою первую запись!
-            </li>
-        {% endfor %}
-    </ul>
+                    <div class="entry-actions">
+                        <button type="button" class="edit-btn" onclick="toggleEdit(this)">✏️ Редактировать</button>
+                        <button type="button" class="save-btn" style="display: none;" onclick="saveEntry(this)">💾 Сохранить</button>
+                        <button type="button" class="cancel-btn" style="display: none;" onclick="cancelEdit(this)">❌ Отменить</button>
+                        <button type="button" class="delete-btn" onclick="deleteEntry(this)">🗑️ Удалить</button>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="no-entries">
+                    <div class="empty-state">
+                        <span class="empty-icon">📝</span>
+                        <p>Записей пока нет. Создайте свою первую запись!</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'diary/script.js' %}"></script>
 {% endblock %}
