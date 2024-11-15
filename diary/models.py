@@ -6,6 +6,7 @@ class Entry(models.Model):
     content = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     is_public = models.BooleanField(default=False)  # Добавляем это поле
+    attachment = models.FileField(upload_to='attachments/', blank=True, null=True)
 
     class Meta:
         ordering = ['-date_created']

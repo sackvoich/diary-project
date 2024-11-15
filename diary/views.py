@@ -44,7 +44,7 @@ def user_login(request):
 @login_required
 def diary(request):
     if request.method == 'POST':
-        form = EntryForm(request.POST)
+        form = EntryForm(request.POST, request.FILES)
         if form.is_valid():
             entry = form.save(commit=False)
             entry.user = request.user

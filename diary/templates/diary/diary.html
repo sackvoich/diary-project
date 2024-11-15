@@ -1,12 +1,12 @@
 {% extends "diary/base.html" %}
-{% load static %}  <!--- Добавлен load static -->
+{% load static %}
 
 {% block title %}Личный дневник{% endblock %}
 
 {% block content %}
     <div class="diary-container">
         <h1>Мои записи</h1>
-        <form method="POST" class="entry-form">
+        <form method="POST" class="entry-form" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
                 {{ form.content.label_tag }}
@@ -16,17 +16,26 @@
                 {{ form.is_public }}
                 {{ form.is_public.label_tag }}
             </div>
+            <div class="form-group">
+                {{ form.attachment.label_tag }}
+                {{ form.attachment }}
+            </div>
             <button type="submit">Добавить запись</button>
         </form>
 
         <ul class="entries-list">
             {% for entry in entries %}
                 <li class="entry-item {% if entry.is_public %}public{% endif %}" data-entry-id="{{ entry.id }}">
-                    <span class="edit-url" style="display:none;" data-url="{% url 'edit_entry' entry_id=entry.id %}"></span> <!--- Добавлено -->
+                    <span class="edit-url" style="display:none;" data-url="{% url 'edit_entry' entry_id=entry.id %}"></span>
                     <div class="entry-content">
                         <p class="content-text" style="display: block;">{{ entry.content }}</p>
                         <textarea class="edit-textarea" style="display: none;">{{ entry.content }}</textarea>
                     </div>
+
+                    {% if entry.attachment %}
+                        <p><a href="{{ entry.attachment.url }}" download>{{ entry.attachment.name }}</a></p>
+                    {% endif %}
+
                     <div class="entry-meta">
                         <span class="date">{{ entry.date_created|date:"d.m.Y H:i" }}</span>
                         <div class="entry-status">
