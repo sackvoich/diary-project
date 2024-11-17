@@ -9,7 +9,8 @@ class RegistrationForm(UserCreationForm):
         fields = ['username', 'password1', 'password2']
 
 class EntryForm(forms.ModelForm):
-    attachment = forms.FileField(required=False)
+    ALLOWED_FILE_TYPES = ['png', 'jpg', 'jpeg', 'gif', 'pdf']
+
     class Meta:
         model = Entry
         fields = ['content', 'is_public', 'attachment']
@@ -20,5 +21,13 @@ class EntryForm(forms.ModelForm):
         labels = {
             'content': 'Запись',
             'is_public': 'Сделать публичной',
-            'attachment': 'Файл'
+            'attachment': 'Файл (png, jpg, jpeg, gif, pdf)'
         }
+
+    def clean_attachment(self):
+        attachment = self.cleaned_data.get('attachment')
+        if attachment:
+            file_type = attachment.name.split('.')[-1].lower()
+            if file_type not in self.ALLOWED_FILE_TYPES:
+                raise forms.ValidationError("Разрешены только файлы следующих типов: png, jpg, jpeg, gif, pdf.")
+        return attachment

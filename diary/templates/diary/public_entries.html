@@ -1,4 +1,5 @@
 {% extends "diary/base.html" %}
+{% load diary_tags %}
 
 {% block title %}Публичные записи{% endblock %}
 
@@ -9,6 +10,17 @@
             <li class="entry-item">
                 <div class="entry-content">
                     {{ entry.content }}
+
+                    {% if entry.attachment %}
+                        {% if entry.attachment.url|is_image %}
+                           <img src="{{ entry.attachment.url }}" alt="Attachment" style="max-width: 100%; max-height: 300px; display: block;">
+                        {% elif entry.attachment.url|slice:"-4:" == ".pdf" %}
+                            <p><a href="{{ entry.attachment.url }}" target="_blank">Просмотреть PDF</a></p>
+                        {% else %}
+                            <p><a href="{{ entry.attachment.url }}" download>{{ entry.attachment.name }}</a></p>
+                        {% endif %}
+                    {% endif %}
+
                     <div class="entry-meta">
                         <span class="author">Автор: {{ entry.user.username }}</span>
                         <span class="date">{{ entry.date_created|date:"d.m.Y H:i" }}</span>

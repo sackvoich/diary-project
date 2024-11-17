@@ -1,5 +1,6 @@
 {% extends "diary/base.html" %}
 {% load static %}
+{% load diary_tags %}
 
 {% block title %}Личный дневник{% endblock %}
 
@@ -33,7 +34,13 @@
                     </div>
 
                     {% if entry.attachment %}
-                        <p><a href="{{ entry.attachment.url }}" download>{{ entry.attachment.name }}</a></p>
+                        {% if entry.attachment and entry.attachment.url|is_image %}
+                            <img src="{{ entry.attachment.url }}" ... >
+                        {% elif entry.attachment and entry.attachment.url|slice:"-4:" == ".pdf" %}
+                            <p><a href="{{ entry.attachment.url }}" ... >Просмотреть PDF</a></p>
+                        {% elif entry.attachment %}
+                            <p><a href="{{ entry.attachment.url }}" ... >{{ entry.attachment.name }}</a></p>
+                        {% endif %}
                     {% endif %}
 
                     <div class="entry-meta">
