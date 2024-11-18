@@ -2,9 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    {% load static %}
     <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="{% static 'diary/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'diary/dark-theme.css' %}" id="dark-theme-style" disabled>
 </head>
 <body>
     <header>
@@ -21,6 +22,10 @@
                 <a href="{% url 'login' %}">Войти</a>
                 <a href="{% url 'register' %}">Регистрация</a>
             {% endif %}
+            <button id="theme-toggle">
+                <span id="sun-icon" class="theme-icon"><i class="fas fa-sun"></i></span>
+                <span id="moon-icon" class="theme-icon" style="display: none;"><i class="fas fa-moon"></i></span>
+              </button>
         </nav>
     </header>
 
@@ -38,8 +43,10 @@
     </main>
 
     <footer>
-        <p>&copy; 2024 Дневник. Все права защищены.</p>
+        <p>© 2024 Дневник. Все права защищены.</p>
     </footer>
+
+    <script src="{% static 'diary/script.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
-{% block extra_js %}{% endblock %}
 </html>

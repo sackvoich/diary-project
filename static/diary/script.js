@@ -1,5 +1,43 @@
 console.log('JavaScript loaded');
 
+const themeToggle = document.getElementById('theme-toggle');
+const darkThemeStyle = document.getElementById('dark-theme-style');
+const sunIcon = document.getElementById('sun-icon');
+const moonIcon = document.getElementById('moon-icon');
+
+
+// Проверка localStorage и установка начального состояния
+const savedTheme = localStorage.getItem('theme');
+
+if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    darkThemeStyle.disabled = false;
+    sunIcon.style.display = 'none';
+    moonIcon.style.display = 'inline-block';
+} else { // Добавлено условие else
+    document.body.classList.remove('dark-theme'); // Удаляем класс, если тема светлая
+    darkThemeStyle.disabled = true;
+    sunIcon.style.display = 'inline-block';
+    moonIcon.style.display = 'none';
+}
+
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-theme');
+
+    // Логика для переключения CSS и иконок
+    if (document.body.classList.contains('dark-theme')) {
+        darkThemeStyle.disabled = false;
+        localStorage.setItem('theme', 'dark');
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'inline-block';
+    } else {
+        darkThemeStyle.disabled = true;
+        localStorage.setItem('theme', 'light');
+        sunIcon.style.display = 'inline-block';
+        moonIcon.style.display = 'none';
+    }
+});
+
 function toggleEdit(btn) {
     console.log('toggleEdit called');
     const entryItem = btn.closest('.entry-item');
