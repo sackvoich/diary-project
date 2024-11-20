@@ -187,3 +187,34 @@ footer {
     color: var(--background-color);
 }
 
+.tag {
+    background-color: #383838; /* Darker grey background for dark theme */
+    color: #e0e0e0; /* Lighter text for dark theme */
+}
+
+.search-form input[type="text"] {
+    background-color: #333; /* Dark background */
+    color: #eee; /* Light text */
+    border: 1px solid #555; /* Darker border */
+}
+
+.search-form button {
+    background-color: #64b5f6;  /* Different color for button in dark theme */
+    color: #1e1e1e; /* Dark text for button */
+}
+
+.search-form button:hover {
+    background-color: darken(#64b5f6, 10%);
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    background-color: #333;
+    color: #eee;
+    border: 1px solid #555;
+}
+
+.login-form input[type="text"]::placeholder,
+.login-form input[type="password"]::placeholder { /* Placeholder color */
+    color: #aaa; /* Lighter placeholder color */
+}

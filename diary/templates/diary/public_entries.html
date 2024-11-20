@@ -6,12 +6,17 @@
 {% block content %}
     <h1>Публичные записи</h1>
 
+    <form method="GET" action="{% url 'public_entries' %}" class="search-form">
+        <input type="text" name="q" placeholder="Поиск по тексту или #тегу" value="{{ request.GET.q }}">
+        <button type="submit">Поиск</button>
+    </form>
+
     <div class="tags-container">
-        <a href="{% url 'public_entries' %}" class="{% if not selected_tag %}active{% endif %}">Все</a>
-        {% for tag in tags %}
-            <a href="{% url 'public_entries' %}?tag={{ tag.name }}" class="{% if selected_tag == tag.name %}active{% endif %}">{{ tag.name }}</a>
-        {% endfor %}
-    </div>    
+        <a href="{% url 'public_entries' %}" class="{% if not selected_tag and not request.GET.q  %}active{% endif %}">Все</a>
+            {% for tag in tags %}
+                <a href="{% url 'public_entries' %}?tag={{ tag.name }}" class="{% if selected_tag == tag.name %}active{% endif %}">{{ tag.name }}</a>
+            {% endfor %}
+    </div>
     
     <ul class="entries-list">
         {% for entry in entries %}

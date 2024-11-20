@@ -71,11 +71,30 @@ def diary(request):
 def public_entries(request):
     tags = Tag.objects.all()
     tag_name = request.GET.get('tag')
+    search_query = request.GET.get('q', '') # получаем поисковый запрос
     entries = Entry.objects.filter(is_public=True).order_by('-date_created')
-    if tag_name:
-        entries = entries.filter(tags__name=tag_name)
+
+    if search_query:
+        # Разделяем запрос на слова и теги
+        search_terms = search_query.split()
+        tag_queries = [term[1:] for term in search_terms if term.startswith('#')]
+        text_queries = [term for term in search_terms if not term.startswith('#')]
+
+        # Фильтруем по тексту
+        if text_queries:
+             entries = entries.filter(content__icontains=text_queries[0])
+
+        # Фильтруем по тегам
+        if tag_queries:
+            for tag_query in tag_queries:
+                entries = entries.filter(tags__name__icontains=tag_query)
+
+
+    elif tag_name:
+            entries = entries.filter(tags__name=tag_name)
+        
     return render(request, 'diary/public_entries.html', {
-        'entries': entries,'tags' : tags, 'selected_tag' : tag_name
+        'entries': entries, 'tags': tags, 'selected_tag': tag_name, 'search_query': search_query # передаем поисковый запрос в шаблон
     })
 
 @login_required
