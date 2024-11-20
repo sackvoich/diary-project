@@ -48,6 +48,7 @@ function toggleEdit(btn) {
     const editBtn = entryItem.querySelector('.edit-btn');
     const saveBtn = entryItem.querySelector('.save-btn');
     const cancelBtn = entryItem.querySelector('.cancel-btn');
+    const entryTags = entryItem.querySelector('.entry-tags');
 
     textarea.value = contentText.textContent.trim();
 
@@ -57,6 +58,19 @@ function toggleEdit(btn) {
     editBtn.style.display = 'none';
     saveBtn.style.display = 'inline-block';
     cancelBtn.style.display = 'inline-block';
+
+    const entryTagsContainer = entryItem.querySelector('.entry-tags');
+    const existingTags = Array.from(entryTagsContainer.querySelectorAll('.tag')).map(tag => tag.textContent);
+    let tagInput = entryItem.querySelector('.tag-input');
+    if (!tagInput) { // Create tag input if it doesn't exist
+        tagInput = document.createElement('input');
+        tagInput.type = 'text';
+        tagInput.className = 'tag-input';
+        tagInput.placeholder = 'Введите теги через запятую';
+        entryTagsContainer.parentNode.insertBefore(tagInput, entryTagsContainer.nextSibling);
+    }
+
+    tagInput.value = existingTags.map(tag => `#${tag}`).join(', '); // Add # to existing tags
 
     textarea.focus();
 }
@@ -68,12 +82,17 @@ function cancelEdit(btn) {
     const editBtn = entryItem.querySelector('.edit-btn');
     const saveBtn = entryItem.querySelector('.save-btn');
     const cancelBtn = entryItem.querySelector('.cancel-btn');
+    const tagInput = entryItem.querySelector('.tag-input');
 
     contentText.style.display = 'block';
     textarea.style.display = 'none';
     editBtn.style.display = 'inline-block';
     saveBtn.style.display = 'none';
     cancelBtn.style.display = 'none';
+
+    if (tagInput) {
+        tagInput.remove();
+    }
 }
 
 async function saveEntry(btn) {
@@ -81,29 +100,42 @@ async function saveEntry(btn) {
     const editUrl = entryItem.querySelector('.edit-url').dataset.url; // <---  Получение URL из data-url
     const textarea = entryItem.querySelector('.edit-textarea');
     const contentText = entryItem.querySelector('.content-text');
+    const tagElements = entryItem.querySelectorAll('.entry-tags .tag');
+    const tagIds = Array.from(tagElements).map(tag => tag.dataset.tagId);
+
+    const tagInput = entryItem.querySelector('.tag-input');
+    const tags = tagInput 
+        ? tagInput.value.split(',') // split by comma
+            .map(tag => tag.trim()) // remove whitespace
+            .filter(tag => tag.startsWith('#')) // filter for tags starting with #
+            .map(tag => tag.slice(1)) // remove the #
+        : [];
 
     try {
         const response = await fetch(editUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-CSRFToken': getCookie('csrftoken')
             },
             body: JSON.stringify({
-                content: textarea.value.trim()
+                content: textarea.value.trim(),
+                tags: tags
             })
         });
 
         if (response.ok) {
-            contentText.textContent = textarea.value.trim();
-
-            contentText.style.display = 'block';
-            textarea.style.display = 'none';
-            btn.style.display = 'none';
-            entryItem.querySelector('.cancel-btn').style.display = 'none';
-            entryItem.querySelector('.edit-btn').style.display = 'inline-block';
-
-            showNotification('Запись успешно обновлена!', 'success');
+            // Update displayed content and tags
+            contentText.textContent = textarea.value
+            const entryTagsContainer = entryItem.querySelector('.entry-tags');
+            renderTags(tags, entryTagsContainer);
+            entryTagsContainer.innerHTML = ''; // Clear existing tags
+            tags.forEach(tagName => {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'tag';
+                tagSpan.textContent = tagName;
+                entryTagsContainer.appendChild(tagSpan);
+            });
         } else {
             const errorData = await response.json();
             let errorMessage = 'Ошибка при сохранении';
@@ -172,3 +204,30 @@ function showNotification(message, type) {
         setTimeout(() => notification.remove(), 500);
     }, 3000);
 }
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function renderTags(tags, container) {
+    container.innerHTML = ''; // Clear existing tags
+  
+    tags.forEach(tagName => {
+        const tagSpan = document.createElement('span');
+        tagSpan.className = 'tag';
+        tagSpan.textContent = `#${tagName}`; // Add # before tag name
+        container.appendChild(tagSpan);
+    });
+  }

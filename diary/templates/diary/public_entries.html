@@ -5,6 +5,14 @@
 
 {% block content %}
     <h1>Публичные записи</h1>
+
+    <div class="tags-container">
+        <a href="{% url 'public_entries' %}" class="{% if not selected_tag %}active{% endif %}">Все</a>
+        {% for tag in tags %}
+            <a href="{% url 'public_entries' %}?tag={{ tag.name }}" class="{% if selected_tag == tag.name %}active{% endif %}">{{ tag.name }}</a>
+        {% endfor %}
+    </div>    
+    
     <ul class="entries-list">
         {% for entry in entries %}
             <li class="entry-item">

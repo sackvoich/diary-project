@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Entry
+from .models import Entry, Tag
 
 class RegistrationForm(UserCreationForm):
     class Meta:
@@ -11,9 +11,17 @@ class RegistrationForm(UserCreationForm):
 class EntryForm(forms.ModelForm):
     ALLOWED_FILE_TYPES = ['png', 'jpg', 'jpeg', 'gif', 'pdf']
 
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+    
+    new_tags = forms.CharField(label = 'tags', required=False, help_text = "Введите тэги, отделяя каждый запятой (к примеруу #tag1, #tag2, #tag3)")
+    
     class Meta:
         model = Entry
-        fields = ['content', 'is_public', 'attachment']
+        fields = ['content', 'is_public', 'attachment', 'tags']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 5}),
             'is_public': forms.CheckboxInput(attrs={'class': 'privacy-checkbox'})

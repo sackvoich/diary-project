@@ -20,6 +20,11 @@
             <div class="form-group">
                 {{ form.attachment.label_tag }}
                 {{ form.attachment }}
+            </div>    
+            <div class="form-group">  
+                {{ form.new_tags.label_tag }} 
+                {{ form.new_tags }}  
+                <small class="form-text text-muted">{{ form.new_tags.help_text }}</small>
             </div>
             <button type="submit">Добавить запись</button>
         </form>
@@ -61,6 +66,12 @@
                         <button type="button" class="cancel-btn" style="display: none;" onclick="cancelEdit(this)">❌ Отменить</button>
                         <button type="button" class="delete-btn" onclick="deleteEntry(this)">🗑️ Удалить</button>
                     </div>
+                    <div class="entry-tags">
+                        {% for tag in entry.tags.all %}
+                            <span class="tag">{{ tag.name }}</span><span> </span>
+                        {% endfor %}
+                    </div>
+        
                 </li>
             {% empty %}
                 <li class="no-entries">
